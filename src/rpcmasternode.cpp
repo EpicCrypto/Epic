@@ -8,6 +8,7 @@
 #include "init.h"
 #include "main.h"
 #include "masternode-budget.h"
+#include "masternode-helpers.h"
 #include "masternode-payments.h"
 #include "masternodeconfig.h"
 #include "masternodeman.h"
@@ -192,8 +193,11 @@ UniValue masternode(const UniValue& params, bool fHelp)
     }
 
     if (strCommand == "init") {
-        Array newParams(params.size() - 1);
-        std::copy(params.begin() + 1, params.end(), newParams.begin());
+        UniValue newParams(UniValue::VARR);
+        // forward params but skip command
+        for (unsigned int i = 1; i < params.size(); i++) {
+            newParams.push_back(params[i]);
+        }
         return initmasternode(newParams, fHelp);
     }
     
@@ -906,7 +910,7 @@ UniValue initmasternode (const UniValue& params, bool fHelp)
     std::string errorMessage;
     CKey key;
     CPubKey pubkey;
-    if (!obfuScationSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey)) {
+    if (!masternodeSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey)) {
         throw runtime_error("Invalid masternodeprivkey. Please see documenation.");
     }
     activeMasternode.pubKeyMasternode = pubkey;
@@ -933,7 +937,7 @@ UniValue masternodeisinit (const UniValue& params, bool fHelp)
     std::string errorMessage;
     CKey key;
     CPubKey pubkey;
-    if(!obfuScationSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey))
+    if(!masternodeSigner.SetKey(strMasterNodePrivKey, errorMessage, key, pubkey))
         return false;
     return true;
 }

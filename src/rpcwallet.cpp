@@ -1072,7 +1072,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
             }
             else
             {
-                Object obj;
+                UniValue obj(UniValue::VOBJ);
                 obj.push_back(Pair("address",       address.ToString()));
                 obj.push_back(Pair("account",       strAccount));
                 obj.push_back(Pair("amount",        ValueFromAmount(nAmount)));
