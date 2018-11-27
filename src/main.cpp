@@ -1843,7 +1843,9 @@ bool CScriptCheck::operator()()
 
 bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& inputs, bool fScriptChecks, unsigned int flags, bool cacheStore, std::vector<CScriptCheck>* pvChecks)
 {
-    if (!tx.IsCoinBase()) {
+    
+	CBlockIndex* pindexPrev = mapBlockIndex.find(inputs.GetBestBlock())->second;
+	if (!tx.IsCoinBase() && pindexPrev->nHeight >= 90000) {
         if (pvChecks)
             pvChecks->reserve(tx.vin.size());
 
@@ -1879,18 +1881,18 @@ bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsVi
         }
 
         if (!tx.IsCoinStake()) {
-             if (nValueIn < tx.GetValueOut())
+             if (nValueIn < tx.GetValueOut() && pindexPrev->nHeight >= 90000)
                 return state.DoS(100, error("CheckInputs() : %s value in (%s) < value out (%s)",
                                           tx.GetHash().ToString(), FormatMoney(nValueIn), FormatMoney(tx.GetValueOut())),
                      REJECT_INVALID, "bad-txns-in-belowout");
 
              
             CAmount nTxFee = nValueIn - tx.GetValueOut();
-            if (nTxFee < 0)
+            if (nTxFee < 0 && pindexPrev->nHeight >= 90000)
                 return state.DoS(100, error("CheckInputs() : %s nTxFee < 0", tx.GetHash().ToString()),
                     REJECT_INVALID, "bad-txns-fee-negative");
             nFees += nTxFee;
-            if (!MoneyRange(nFees))
+            if (!MoneyRange(nFees) && pindexPrev->nHeight >= 88500)
                 return state.DoS(100, error("CheckInputs() : nFees out of range"),
                     REJECT_INVALID, "bad-txns-fee-outofrange");
         }
