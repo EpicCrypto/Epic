@@ -1892,7 +1892,7 @@ bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsVi
                 return state.DoS(100, error("CheckInputs() : %s nTxFee < 0", tx.GetHash().ToString()),
                     REJECT_INVALID, "bad-txns-fee-negative");
             nFees += nTxFee;
-            if (!MoneyRange(nFees) && pindexPrev->nHeight >= 88500)
+            if (!MoneyRange(nFees) && pindexPrev->nHeight >= 90000)
                 return state.DoS(100, error("CheckInputs() : nFees out of range"),
                     REJECT_INVALID, "bad-txns-fee-outofrange");
         }
